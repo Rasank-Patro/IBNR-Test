@@ -51,14 +51,6 @@ if option == 'Input Dataset':
         st.session_state.uploaded_df = df  # Store the dataset in session state
         st.write("Data Preview:")
         st.dataframe(df.head())
-        prompt = st.text_area("Enter your prompt:")
-        if st.button("Generate:"):
-            if prompt: 
-                st.write("LLM is generating your answer, please wait...")
-                st.write(pandas_ai.run(df, prompt=prompt))
-            else:
-                st.warning("Please enter a prompt first.")
-        st.divider()
 
         try:
             with st.spinner('Processing data...'):
@@ -81,7 +73,7 @@ if option == 'Input Dataset':
                                 df_to_process = calculate_ataf(st.session_state.uploaded_df)
                                 agent_executor = create_pandas_dataframe_agent(
                                                     llm,
-                                                    df_to_process,
+                                                    [df_to_process,df],
                                                     agent_type="zero-shot-react-description",
                                                     verbose=True,
                                                     allow_dangerous_code=True,
@@ -98,25 +90,25 @@ if option == 'Input Dataset':
             elif selected_method == 'Show Age-to-Age Factors Heatmap for Paid Claim Amount':
                 with st.spinner('Generating heatmap...'):
                     calculate_and_plot_ataf_cumpaid_plotly(st.session_state.uploaded_df)
-                    # user_query = st.text_input("Ask your question related to the heatmap:")
-                    # if user_query:
-                    #     try:
-                    #         with st.spinner("Processing your query..."):
-                    #             # Assuming your DataFrame after modifications
-                    #             df_to_process = calculate_ataf_cumpaid(st.session_state.uploaded_df)
-                    #             agent_executor = create_pandas_dataframe_agent(
-                    #                                 llm,
-                    #                                 df_to_process,
-                    #                                 agent_type="zero-shot-react-description",
-                    #                                 verbose=True,
-                    #                                 allow_dangerous_code=True,
-                    #                                 return_intermediate_steps=True)
-                    #             user_answer = agent_executor.invoke(user_query)
-                    #             refined_answer = beautify_output(user_answer['output'])
-                    #             st.write(refined_answer)
+                    user_query = st.text_input("Ask your question related to the heatmap:")
+                    if user_query:
+                        try:
+                            with st.spinner("Processing your query..."):
+                                # Assuming your DataFrame after modifications
+                                df_to_process = calculate_ataf_cumpaid(st.session_state.uploaded_df)
+                                agent_executor = create_pandas_dataframe_agent(
+                                                    llm,
+                                                    df_to_process,
+                                                    agent_type="zero-shot-react-description",
+                                                    verbose=True,
+                                                    allow_dangerous_code=True,
+                                                    return_intermediate_steps=True)
+                                user_answer = agent_executor.invoke(user_query)
+                                refined_answer = beautify_output(user_answer['output'])
+                                st.write(refined_answer)
 
-                    #     except Exception as e:
-                    #         st.error(f"Error processing your query: {e}")
+                        except Exception as e:
+                            st.error(f"Error processing your query: {e}")
 
         except Exception as e:
             st.error(f"Failed to process file: {e}")
@@ -145,114 +137,114 @@ else:
                     st.write(":green-background[:bulb: Hey! Simple Moving Average is best used when the ATAF data points are consistent and there are no significant outliers. It works best for scenarios where data variability is relatively low.]")
                     st.divider()
                     pivot_atafs=visualize_sma_plotly(pivot_atafs)
-                    # st.divider()
-                    # user_query = st.text_input("Ask your question related to the Simple Moving Average Values:")
-                    # if user_query:
-                    #     try:
-                    #         with st.spinner("Processing your query..."):
-                    #             agent_executor = create_pandas_dataframe_agent(
-                    #                                 llm,
-                    #                                 pivot_atafs,
-                    #                                 agent_type="zero-shot-react-description",
-                    #                                 verbose=True,
-                    #                                 allow_dangerous_code=True,
-                    #                                 return_intermediate_steps=True)
-                    #             user_answer = agent_executor.invoke(user_query)
-                    #             refined_answer = beautify_output(user_answer['output'])
-                    #             st.write(refined_answer)
-                    #     except Exception as e:
-                    #         st.error(f"Error processing your query: {e}")     
+                    st.divider()
+                    user_query = st.text_input("Ask your question related to the Simple Moving Average Values:")
+                    if user_query:
+                        try:
+                            with st.spinner("Processing your query..."):
+                                agent_executor = create_pandas_dataframe_agent(
+                                                    llm,
+                                                    pivot_atafs,
+                                                    agent_type="zero-shot-react-description",
+                                                    verbose=True,
+                                                    allow_dangerous_code=True,
+                                                    return_intermediate_steps=True)
+                                user_answer = agent_executor.invoke(user_query)
+                                refined_answer = beautify_output(user_answer['output'])
+                                st.write(refined_answer)
+                        except Exception as e:
+                            st.error(f"Error processing your query: {e}")     
                     
                 elif selected_method == 'Volume Weighted Average':
                     st.write(":green-background[:bulb: Hey! We have incorporated the Incurred Claims Amount as weights while calculating the volume weighted average. This method is particularly very useful in scenarios where claim amounts are highly variable. By weighting more recent claims or those with larger impacts (such as higher claim amounts) more heavily, it can provide a more accurate reflection of recent trends and expected future developments.]")
                     st.divider()
                     pivot_atafs=visualize_vwa_plotly(pivot_atafs, df)
-                    # st.divider()
-                    # user_query = st.text_input("Ask your question related to the Volume Weighted Average Values:")
-                    # if user_query:
-                    #     try:
-                    #         with st.spinner("Processing your query..."):
-                    #             agent_executor = create_pandas_dataframe_agent(
-                    #                                 llm,
-                    #                                 pivot_atafs,
-                    #                                 agent_type="zero-shot-react-description",
-                    #                                 verbose=True,
-                    #                                 allow_dangerous_code=True,
-                    #                                 return_intermediate_steps=True)
-                    #             user_answer = agent_executor.invoke(user_query)
-                    #             refined_answer = beautify_output(user_answer['output'])
-                    #             st.write(refined_answer)
-                    #     except Exception as e:
-                    #         st.error(f"Error processing your query: {e}")     
+                    st.divider()
+                    user_query = st.text_input("Ask your question related to the Volume Weighted Average Values:")
+                    if user_query:
+                        try:
+                            with st.spinner("Processing your query..."):
+                                agent_executor = create_pandas_dataframe_agent(
+                                                    llm,
+                                                    pivot_atafs,
+                                                    agent_type="zero-shot-react-description",
+                                                    verbose=True,
+                                                    allow_dangerous_code=True,
+                                                    return_intermediate_steps=True)
+                                user_answer = agent_executor.invoke(user_query)
+                                refined_answer = beautify_output(user_answer['output'])
+                                st.write(refined_answer)
+                        except Exception as e:
+                            st.error(f"Error processing your query: {e}")     
                     
-                # elif selected_method == 'Geometric Average':
-                #     pivot_atafs=visualize_ga_plotly(pivot_atafs)
+                elif selected_method == 'Geometric Average':
+                    pivot_atafs=visualize_ga_plotly(pivot_atafs)
                 
                 elif selected_method == 'Exponential Smoothing':
                     st.write(":green-background[:bulb: Hey! We have applied an ideal Exponential Smoothing factor for this calculation. This method is particularly useful when we want to smooth out short-term fluctuations and highlight long-term trends or cycles.]")
                     st.divider()
                     pivot_atafs=visualize_esa_plotly(pivot_atafs)
-                    # st.divider()
-                    # user_query = st.text_input("Ask your question related to the Exponential Smoothing Average Values:")
-                    # if user_query:
-                    #     try:
-                    #         with st.spinner("Processing your query..."):
-                    #             agent_executor = create_pandas_dataframe_agent(
-                    #                                 llm,
-                    #                                 pivot_atafs,
-                    #                                 agent_type="zero-shot-react-description",
-                    #                                 verbose=True,
-                    #                                 allow_dangerous_code=True,
-                    #                                 return_intermediate_steps=True)
-                    #             user_answer = agent_executor.invoke(user_query)
-                    #             refined_answer = beautify_output(user_answer['output'])
-                    #             st.write(refined_answer)
-                    #     except Exception as e:
-                    #         st.error(f"Error processing your query: {e}")
+                    st.divider()
+                    user_query = st.text_input("Ask your question related to the Exponential Smoothing Average Values:")
+                    if user_query:
+                        try:
+                            with st.spinner("Processing your query..."):
+                                agent_executor = create_pandas_dataframe_agent(
+                                                    llm,
+                                                    pivot_atafs,
+                                                    agent_type="zero-shot-react-description",
+                                                    verbose=True,
+                                                    allow_dangerous_code=True,
+                                                    return_intermediate_steps=True)
+                                user_answer = agent_executor.invoke(user_query)
+                                refined_answer = beautify_output(user_answer['output'])
+                                st.write(refined_answer)
+                        except Exception as e:
+                            st.error(f"Error processing your query: {e}")
                     
                 elif selected_method == 'Median-Based':
                     st.write(":green-background[:bulb: Hey! Median Based Average is particularly robust against outliers, which is beneficial in handling claims data that often contains large, atypical payouts. It's best used for skewed distributions or when outliers are present and could distort the mean.]")
                     st.divider()
                     pivot_atafs=visualize_median_plotly(pivot_atafs)
-                    # st.divider()
-                    # user_query = st.text_input("Ask your question related to the Median Based Average Values:")
-                    # if user_query:
-                    #     try:
-                    #         with st.spinner("Processing your query..."):
-                    #             agent_executor = create_pandas_dataframe_agent(
-                    #                                 llm,
-                    #                                 pivot_atafs,
-                    #                                 agent_type="zero-shot-react-description",
-                    #                                 verbose=True,
-                    #                                 allow_dangerous_code=True,
-                    #                                 return_intermediate_steps=True)
-                    #             user_answer = agent_executor.invoke(user_query)
-                    #             refined_answer = beautify_output(user_answer['output'])
-                    #             st.write(refined_answer)
-                    #     except Exception as e:
-                    #         st.error(f"Error processing your query: {e}")
+                    st.divider()
+                    user_query = st.text_input("Ask your question related to the Median Based Average Values:")
+                    if user_query:
+                        try:
+                            with st.spinner("Processing your query..."):
+                                agent_executor = create_pandas_dataframe_agent(
+                                                    llm,
+                                                    pivot_atafs,
+                                                    agent_type="zero-shot-react-description",
+                                                    verbose=True,
+                                                    allow_dangerous_code=True,
+                                                    return_intermediate_steps=True)
+                                user_answer = agent_executor.invoke(user_query)
+                                refined_answer = beautify_output(user_answer['output'])
+                                st.write(refined_answer)
+                        except Exception as e:
+                            st.error(f"Error processing your query: {e}")
                     
                 elif selected_method == 'Trimmed Mean':
                     st.write(":green-background[:bulb: Hey! Trimmed Mean Average particularly strikes a balance between excluding outliers and retaining data. It's useful when the data set includes some extreme claims that should not overly influence the LDF but also contains valuable information in the outer ranges of data distribution.]")
                     st.divider()
                     pivot_atafs=visualize_trimmed_plotly(pivot_atafs)
-                    # st.divider()
-                    # user_query = st.text_input("Ask your question related to the Trimmed Mean Average Values:")
-                    # if user_query:
-                    #     try:
-                    #         with st.spinner("Processing your query..."):
-                    #             agent_executor = create_pandas_dataframe_agent(
-                    #                                 llm,
-                    #                                 pivot_atafs,
-                    #                                 agent_type="zero-shot-react-description",
-                    #                                 verbose=True,
-                    #                                 allow_dangerous_code=True,
-                    #                                 return_intermediate_steps=True)
-                    #             user_answer = agent_executor.invoke(user_query)
-                    #             refined_answer = beautify_output(user_answer['output'])
-                    #             st.write(refined_answer)
-                    #     except Exception as e:
-                    #         st.error(f"Error processing your query: {e}")
+                    st.divider()
+                    user_query = st.text_input("Ask your question related to the Trimmed Mean Average Values:")
+                    if user_query:
+                        try:
+                            with st.spinner("Processing your query..."):
+                                agent_executor = create_pandas_dataframe_agent(
+                                                    llm,
+                                                    pivot_atafs,
+                                                    agent_type="zero-shot-react-description",
+                                                    verbose=True,
+                                                    allow_dangerous_code=True,
+                                                    return_intermediate_steps=True)
+                                user_answer = agent_executor.invoke(user_query)
+                                refined_answer = beautify_output(user_answer['output'])
+                                st.write(refined_answer)
+                        except Exception as e:
+                            st.error(f"Error processing your query: {e}")
                     
                 # elif selected_method == 'Harmonic Mean':
                 #     pivot_atafs=visualize_harmonic(pivot_atafs)
@@ -268,45 +260,45 @@ else:
                     st.write(":green-background[:bulb: Hey! Simple Moving Average is best used when the ATAF data points are consistent and there are no significant outliers. It works best for scenarios where data variability is relatively low.]")
                     st.divider()
                     pivot_atafs=visualize_sma_plotly(pivot_claim_atafs)
-                    # st.divider()
-                    # user_query = st.text_input("Ask your question related to the Simple Moving Average Values:")
-                    # if user_query:
-                    #     try:
-                    #         with st.spinner("Processing your query..."):
-                    #             agent_executor = create_pandas_dataframe_agent(
-                    #                                 llm,
-                    #                                 pivot_atafs,
-                    #                                 agent_type="zero-shot-react-description",
-                    #                                 verbose=True,
-                    #                                 allow_dangerous_code=True,
-                    #                                 return_intermediate_steps=True)
-                    #             user_answer = agent_executor.invoke(user_query)
-                    #             refined_answer = beautify_output(user_answer['output'])
-                    #             st.write(refined_answer)
-                    #     except Exception as e:
-                    #         st.error(f"Error processing your query: {e}")  
+                    st.divider()
+                    user_query = st.text_input("Ask your question related to the Simple Moving Average Values:")
+                    if user_query:
+                        try:
+                            with st.spinner("Processing your query..."):
+                                agent_executor = create_pandas_dataframe_agent(
+                                                    llm,
+                                                    pivot_atafs,
+                                                    agent_type="zero-shot-react-description",
+                                                    verbose=True,
+                                                    allow_dangerous_code=True,
+                                                    return_intermediate_steps=True)
+                                user_answer = agent_executor.invoke(user_query)
+                                refined_answer = beautify_output(user_answer['output'])
+                                st.write(refined_answer)
+                        except Exception as e:
+                            st.error(f"Error processing your query: {e}")  
                     
                 elif selected_method == 'Volume Weighted Average':
                     st.write(":green-background[:bulb: Hey! We have incorporated the Paid Claims Amount as weights while calculating the volume weighted average. This method is particularly very useful in scenarios where claim amounts are highly variable. By weighting more recent claims or those with larger impacts (such as higher claim amounts) more heavily, it can provide a more accurate reflection of recent trends and expected future developments.]")
                     st.divider()
                     pivot_atafs=visualize_vwa_plotly(pivot_claim_atafs, df)
-                    # st.divider()
-                    # user_query = st.text_input("Ask your question related to the Volume Weighted Average Values:")
-                    # if user_query:
-                    #     try:
-                    #         with st.spinner("Processing your query..."):
-                    #             agent_executor = create_pandas_dataframe_agent(
-                    #                                 llm,
-                    #                                 pivot_atafs,
-                    #                                 agent_type="zero-shot-react-description",
-                    #                                 verbose=True,
-                    #                                 allow_dangerous_code=True,
-                    #                                 return_intermediate_steps=True)
-                    #             user_answer = agent_executor.invoke(user_query)
-                    #             refined_answer = beautify_output(user_answer['output'])
-                    #             st.write(refined_answer)
-                    #     except Exception as e:
-                    #         st.error(f"Error processing your query: {e}")
+                    st.divider()
+                    user_query = st.text_input("Ask your question related to the Volume Weighted Average Values:")
+                    if user_query:
+                        try:
+                            with st.spinner("Processing your query..."):
+                                agent_executor = create_pandas_dataframe_agent(
+                                                    llm,
+                                                    pivot_atafs,
+                                                    agent_type="zero-shot-react-description",
+                                                    verbose=True,
+                                                    allow_dangerous_code=True,
+                                                    return_intermediate_steps=True)
+                                user_answer = agent_executor.invoke(user_query)
+                                refined_answer = beautify_output(user_answer['output'])
+                                st.write(refined_answer)
+                        except Exception as e:
+                            st.error(f"Error processing your query: {e}")
                     
                 # elif selected_method == 'Geometric Average':
                 #     pivot_atafs=visualize_ga_plotly(pivot_claim_atafs)  
@@ -315,67 +307,67 @@ else:
                     st.write(":green-background[:bulb: Hey! We have applied an ideal Exponential Smoothing factor for this calculation. This method is particularly useful when we want to smooth out short-term fluctuations and highlight long-term trends or cycles.]")
                     st.divider()
                     pivot_atafs=visualize_esa_plotly(pivot_claim_atafs)
-                    # st.divider()
-                    # user_query = st.text_input("Ask your question related to the Exponential Smoothing Average Values:")
-                    # if user_query:
-                    #     try:
-                    #         with st.spinner("Processing your query..."):
-                    #             agent_executor = create_pandas_dataframe_agent(
-                    #                                 llm,
-                    #                                 pivot_atafs,
-                    #                                 agent_type="zero-shot-react-description",
-                    #                                 verbose=True,
-                    #                                 allow_dangerous_code=True,
-                    #                                 return_intermediate_steps=True)
-                    #             user_answer = agent_executor.invoke(user_query)
-                    #             refined_answer = beautify_output(user_answer['output'])
-                    #             st.write(refined_answer)
-                    #     except Exception as e:
-                    #         st.error(f"Error processing your query: {e}")
+                    st.divider()
+                    user_query = st.text_input("Ask your question related to the Exponential Smoothing Average Values:")
+                    if user_query:
+                        try:
+                            with st.spinner("Processing your query..."):
+                                agent_executor = create_pandas_dataframe_agent(
+                                                    llm,
+                                                    pivot_atafs,
+                                                    agent_type="zero-shot-react-description",
+                                                    verbose=True,
+                                                    allow_dangerous_code=True,
+                                                    return_intermediate_steps=True)
+                                user_answer = agent_executor.invoke(user_query)
+                                refined_answer = beautify_output(user_answer['output'])
+                                st.write(refined_answer)
+                        except Exception as e:
+                            st.error(f"Error processing your query: {e}")
                     
                 elif selected_method == 'Median-Based':
                     st.write(":green-background[:bulb: Hey! Median Based Average is particularly robust against outliers, which is beneficial in handling claims data that often contains large, atypical payouts. It's best used for skewed distributions or when outliers are present and could distort the mean.]")
                     st.divider()
                     pivot_atafs=visualize_median_plotly(pivot_claim_atafs)
-                    # st.divider()
-                    # user_query = st.text_input("Ask your question related to the Median Based Average Values:")
-                    # if user_query:
-                    #     try:
-                    #         with st.spinner("Processing your query..."):
-                    #             agent_executor = create_pandas_dataframe_agent(
-                    #                                 llm,
-                    #                                 pivot_atafs,
-                    #                                 agent_type="zero-shot-react-description",
-                    #                                 verbose=True,
-                    #                                 allow_dangerous_code=True,
-                    #                                 return_intermediate_steps=True)
-                    #             user_answer = agent_executor.invoke(user_query)
-                    #             refined_answer = beautify_output(user_answer['output'])
-                    #             st.write(refined_answer)
-                    #     except Exception as e:
-                    #         st.error(f"Error processing your query: {e}")
+                    st.divider()
+                    user_query = st.text_input("Ask your question related to the Median Based Average Values:")
+                    if user_query:
+                        try:
+                            with st.spinner("Processing your query..."):
+                                agent_executor = create_pandas_dataframe_agent(
+                                                    llm,
+                                                    pivot_atafs,
+                                                    agent_type="zero-shot-react-description",
+                                                    verbose=True,
+                                                    allow_dangerous_code=True,
+                                                    return_intermediate_steps=True)
+                                user_answer = agent_executor.invoke(user_query)
+                                refined_answer = beautify_output(user_answer['output'])
+                                st.write(refined_answer)
+                        except Exception as e:
+                            st.error(f"Error processing your query: {e}")
                     
                 elif selected_method == 'Trimmed Mean':
                     st.write(":green-background[:bulb: Hey! Trimmed Mean Average particularly strikes a balance between excluding outliers and retaining data. It's useful when the data set includes some extreme claims that should not overly influence the LDF but also contains valuable information in the outer ranges of data distribution.]")
                     st.divider()
                     pivot_atafs=visualize_trimmed_plotly(pivot_claim_atafs)
-                    # st.divider()
-                    # user_query = st.text_input("Ask your question related to the Trimmed Mean Average Values:")
-                    # if user_query:
-                    #     try:
-                    #         with st.spinner("Processing your query..."):
-                    #             agent_executor = create_pandas_dataframe_agent(
-                    #                                 llm,
-                    #                                 pivot_atafs,
-                    #                                 agent_type="zero-shot-react-description",
-                    #                                 verbose=True,
-                    #                                 allow_dangerous_code=True,
-                    #                                 return_intermediate_steps=True)
-                    #             user_answer = agent_executor.invoke(user_query)
-                    #             refined_answer = beautify_output(user_answer['output'])
-                    #             st.write(refined_answer)
-                    #     except Exception as e:
-                    #         st.error(f"Error processing your query: {e}")
+                    st.divider()
+                    user_query = st.text_input("Ask your question related to the Trimmed Mean Average Values:")
+                    if user_query:
+                        try:
+                            with st.spinner("Processing your query..."):
+                                agent_executor = create_pandas_dataframe_agent(
+                                                    llm,
+                                                    pivot_atafs,
+                                                    agent_type="zero-shot-react-description",
+                                                    verbose=True,
+                                                    allow_dangerous_code=True,
+                                                    return_intermediate_steps=True)
+                                user_answer = agent_executor.invoke(user_query)
+                                refined_answer = beautify_output(user_answer['output'])
+                                st.write(refined_answer)
+                        except Exception as e:
+                            st.error(f"Error processing your query: {e}")
                     
                 # elif selected_method == 'Harmonic Mean':
                 #     pivot_atafs=visualize_harmonic(pivot_claim_atafs)        
@@ -412,66 +404,66 @@ else:
     
                 if selected_summary_option == 'Heatmap of LDF Averaging Methods':
                     visualize_heatmap(summary_IBNR_df,selected_span)
-                    # st.divider()
-                    # user_query = st.text_input("Ask your question related to the LDFs Summary Values:")
-                    # if user_query:
-                    #     try:
-                    #         with st.spinner("Processing your query..."):
-                    #             agent_executor = create_pandas_dataframe_agent(
-                    #                                 llm,
-                    #                                 summary_IBNR_df,
-                    #                                 agent_type="zero-shot-react-description",
-                    #                                 verbose=True,
-                    #                                 allow_dangerous_code=True,
-                    #                                 return_intermediate_steps=True)
-                    #             user_answer = agent_executor.invoke(user_query)
-                    #             refined_answer = beautify_output(user_answer['output'])
-                    #             st.write(refined_answer)
-                    #     except Exception as e:
-                    #         st.error(f"Error processing your query: {e}")
+                    st.divider()
+                    user_query = st.text_input("Ask your question related to the LDFs Summary Values:")
+                    if user_query:
+                        try:
+                            with st.spinner("Processing your query..."):
+                                agent_executor = create_pandas_dataframe_agent(
+                                                    llm,
+                                                    summary_IBNR_df,
+                                                    agent_type="zero-shot-react-description",
+                                                    verbose=True,
+                                                    allow_dangerous_code=True,
+                                                    return_intermediate_steps=True)
+                                user_answer = agent_executor.invoke(user_query)
+                                refined_answer = beautify_output(user_answer['output'])
+                                st.write(refined_answer)
+                        except Exception as e:
+                            st.error(f"Error processing your query: {e}")
                             
                 elif selected_summary_option == 'Radar Chart':
                     min_year = df.accident_year.min()
                     max_year = df.accident_year.max()
                     year = st.selectbox("Select Accident Year:", range(min_year, max_year))
                     visualize_radar_chart(summary_IBNR_df, year)
-                    # st.divider()
-                    # user_query = st.text_input("Ask your question related to the LDFs Summary Values:")
-                    # if user_query:
-                    #     try:
-                    #         with st.spinner("Processing your query..."):
-                    #             agent_executor = create_pandas_dataframe_agent(
-                    #                                 llm,
-                    #                                 summary_IBNR_df,
-                    #                                 agent_type="zero-shot-react-description",
-                    #                                 verbose=True,
-                    #                                 allow_dangerous_code=True,
-                    #                                 return_intermediate_steps=True)
-                    #             user_answer = agent_executor.invoke(user_query)
-                    #             refined_answer = beautify_output(user_answer['output'])
-                    #             st.write(refined_answer)
-                    #     except Exception as e:
-                    #         st.error(f"Error processing your query: {e}")
+                    st.divider()
+                    user_query = st.text_input("Ask your question related to the LDFs Summary Values:")
+                    if user_query:
+                        try:
+                            with st.spinner("Processing your query..."):
+                                agent_executor = create_pandas_dataframe_agent(
+                                                    llm,
+                                                    summary_IBNR_df,
+                                                    agent_type="zero-shot-react-description",
+                                                    verbose=True,
+                                                    allow_dangerous_code=True,
+                                                    return_intermediate_steps=True)
+                                user_answer = agent_executor.invoke(user_query)
+                                refined_answer = beautify_output(user_answer['output'])
+                                st.write(refined_answer)
+                        except Exception as e:
+                            st.error(f"Error processing your query: {e}")
                     
                 elif selected_summary_option == 'Boxplot Charts':
                     visualize_boxplot(summary_IBNR_df)
-                    # st.divider()
-                    # user_query = st.text_input("Ask your question related to the LDFs Summary Values:")
-                    # if user_query:
-                    #     try:
-                    #         with st.spinner("Processing your query..."):
-                    #             agent_executor = create_pandas_dataframe_agent(
-                    #                                 llm,
-                    #                                 summary_IBNR_df,
-                    #                                 agent_type="zero-shot-react-description",
-                    #                                 verbose=True,
-                    #                                 allow_dangerous_code=True,
-                    #                                 return_intermediate_steps=True)
-                    #             user_answer = agent_executor.invoke(user_query)
-                    #             refined_answer = beautify_output(user_answer['output'])
-                    #             st.write(refined_answer)
-                    #     except Exception as e:
-                    #         st.error(f"Error processing your query: {e}")
+                    st.divider()
+                    user_query = st.text_input("Ask your question related to the LDFs Summary Values:")
+                    if user_query:
+                        try:
+                            with st.spinner("Processing your query..."):
+                                agent_executor = create_pandas_dataframe_agent(
+                                                    llm,
+                                                    summary_IBNR_df,
+                                                    agent_type="zero-shot-react-description",
+                                                    verbose=True,
+                                                    allow_dangerous_code=True,
+                                                    return_intermediate_steps=True)
+                                user_answer = agent_executor.invoke(user_query)
+                                refined_answer = beautify_output(user_answer['output'])
+                                st.write(refined_answer)
+                        except Exception as e:
+                            st.error(f"Error processing your query: {e}")
                     
             elif claim_method == 'Paid Claim Amount':
                 summary_options = ['Select a visualization method for the LDF Summary Report','Heatmap of LDF Averaging Methods', 'Radar Chart', 'Boxplot Charts']
@@ -498,66 +490,66 @@ else:
     
                 if selected_summary_option == 'Heatmap of LDF Averaging Methods':
                     visualize_heatmap(summary_IBNR_df,selected_span)
-                    # st.divider()
-                    # user_query = st.text_input("Ask your question related to the LDFs Summary Values:")
-                    # if user_query:
-                    #     try:
-                    #         with st.spinner("Processing your query..."):
-                    #             agent_executor = create_pandas_dataframe_agent(
-                    #                                 llm,
-                    #                                 summary_IBNR_df,
-                    #                                 agent_type="zero-shot-react-description",
-                    #                                 verbose=True,
-                    #                                 allow_dangerous_code=True,
-                    #                                 return_intermediate_steps=True)
-                    #             user_answer = agent_executor.invoke(user_query)
-                    #             refined_answer = beautify_output(user_answer['output'])
-                    #             st.write(refined_answer)
-                    #     except Exception as e:
-                    #         st.error(f"Error processing your query: {e}")
+                    st.divider()
+                    user_query = st.text_input("Ask your question related to the LDFs Summary Values:")
+                    if user_query:
+                        try:
+                            with st.spinner("Processing your query..."):
+                                agent_executor = create_pandas_dataframe_agent(
+                                                    llm,
+                                                    summary_IBNR_df,
+                                                    agent_type="zero-shot-react-description",
+                                                    verbose=True,
+                                                    allow_dangerous_code=True,
+                                                    return_intermediate_steps=True)
+                                user_answer = agent_executor.invoke(user_query)
+                                refined_answer = beautify_output(user_answer['output'])
+                                st.write(refined_answer)
+                        except Exception as e:
+                            st.error(f"Error processing your query: {e}")
                 
                 elif selected_summary_option == 'Radar Chart':
                     min_year = df.accident_year.min()
                     max_year = df.accident_year.max()
                     year = st.selectbox("Select Accident Year:", range(min_year, max_year))
                     visualize_radar_chart(summary_IBNR_df, year)
-                    # st.divider()
-                    # user_query = st.text_input("Ask your question related to the LDFs Summary Values:")
-                    # if user_query:
-                    #     try:
-                    #         with st.spinner("Processing your query..."):
-                    #             agent_executor = create_pandas_dataframe_agent(
-                    #                                 llm,
-                    #                                 summary_IBNR_df,
-                    #                                 agent_type="zero-shot-react-description",
-                    #                                 verbose=True,
-                    #                                 allow_dangerous_code=True,
-                    #                                 return_intermediate_steps=True)
-                    #             user_answer = agent_executor.invoke(user_query)
-                    #             refined_answer = beautify_output(user_answer['output'])
-                    #             st.write(refined_answer)
-                    #     except Exception as e:
-                    #         st.error(f"Error processing your query: {e}")
+                    st.divider()
+                    user_query = st.text_input("Ask your question related to the LDFs Summary Values:")
+                    if user_query:
+                        try:
+                            with st.spinner("Processing your query..."):
+                                agent_executor = create_pandas_dataframe_agent(
+                                                    llm,
+                                                    summary_IBNR_df,
+                                                    agent_type="zero-shot-react-description",
+                                                    verbose=True,
+                                                    allow_dangerous_code=True,
+                                                    return_intermediate_steps=True)
+                                user_answer = agent_executor.invoke(user_query)
+                                refined_answer = beautify_output(user_answer['output'])
+                                st.write(refined_answer)
+                        except Exception as e:
+                            st.error(f"Error processing your query: {e}")
                 
                 elif selected_summary_option == 'Boxplot Charts':
                     visualize_boxplot(summary_IBNR_df)
-                    # st.divider()
-                    # user_query = st.text_input("Ask your question related to the LDFs Summary Values:")
-                    # if user_query:
-                    #     try:
-                    #         with st.spinner("Processing your query..."):
-                    #             agent_executor = create_pandas_dataframe_agent(
-                    #                                 llm,
-                    #                                 summary_IBNR_df,
-                    #                                 agent_type="zero-shot-react-description",
-                    #                                 verbose=True,
-                    #                                 allow_dangerous_code=True,
-                    #                                 return_intermediate_steps=True)
-                    #             user_answer = agent_executor.invoke(user_query)
-                    #             refined_answer = beautify_output(user_answer['output'])
-                    #             st.write(refined_answer)
-                    #     except Exception as e:
-                    #         st.error(f"Error processing your query: {e}")
+                    st.divider()
+                    user_query = st.text_input("Ask your question related to the LDFs Summary Values:")
+                    if user_query:
+                        try:
+                            with st.spinner("Processing your query..."):
+                                agent_executor = create_pandas_dataframe_agent(
+                                                    llm,
+                                                    summary_IBNR_df,
+                                                    agent_type="zero-shot-react-description",
+                                                    verbose=True,
+                                                    allow_dangerous_code=True,
+                                                    return_intermediate_steps=True)
+                                user_answer = agent_executor.invoke(user_query)
+                                refined_answer = beautify_output(user_answer['output'])
+                                st.write(refined_answer)
+                        except Exception as e:
+                            st.error(f"Error processing your query: {e}")
                 
         elif option == 'Actuary Methods for IBNR':
             st.write("Great! You have finally reached the Actuary Method implementation!")
@@ -632,43 +624,43 @@ else:
 
             if selected_diagnostic_option == 'Paid to Reported Incurred Claims Ratio':
                 plot_heatmap_triangle(paid_to_reported_triangle, "Paid Claims to Reported Incurred Claims Ratio Heatmap")
-                # st.divider()
-                # user_query = st.text_input("Ask your question related to Paid To Reported Triangle:")
-                # if user_query:
-                #     try:
-                #         with st.spinner("Processing your query..."):
-                #             agent_executor = create_pandas_dataframe_agent(
-                #                                 llm,
-                #                                 paid_to_reported_triangle,
-                #                                 agent_type="zero-shot-react-description",
-                #                                 verbose=True,
-                #                                 allow_dangerous_code=True,
-                #                                 return_intermediate_steps=True)
-                #             user_answer = agent_executor.invoke(user_query)
-                #             refined_answer = beautify_output(user_answer['output'])
-                #             st.write(refined_answer)
-                #     except Exception as e:
-                #         st.error(f"Error processing your query: {e}")
+                st.divider()
+                user_query = st.text_input("Ask your question related to Paid To Reported Triangle:")
+                if user_query:
+                    try:
+                        with st.spinner("Processing your query..."):
+                            agent_executor = create_pandas_dataframe_agent(
+                                                llm,
+                                                paid_to_reported_triangle,
+                                                agent_type="zero-shot-react-description",
+                                                verbose=True,
+                                                allow_dangerous_code=True,
+                                                return_intermediate_steps=True)
+                            user_answer = agent_executor.invoke(user_query)
+                            refined_answer = beautify_output(user_answer['output'])
+                            st.write(refined_answer)
+                    except Exception as e:
+                        st.error(f"Error processing your query: {e}")
                             
             elif selected_diagnostic_option == 'Incurred to Earned Premium Ratio':
                 plot_heatmap_triangle(incurred_to_earned_triangle, "Incurred Claims to Earned Premium Ratio Heatmap")
-                # st.divider()
-                # user_query = st.text_input("Ask your question related to Incurred to Earned Premium Ratio Triangle:")
-                # if user_query:
-                #     try:
-                #         with st.spinner("Processing your query..."):
-                #             agent_executor = create_pandas_dataframe_agent(
-                #                                 llm,
-                #                                 incurred_to_earned_triangle,
-                #                                 agent_type="zero-shot-react-description",
-                #                                 verbose=True,
-                #                                 allow_dangerous_code=True,
-                #                                 return_intermediate_steps=True)
-                #             user_answer = agent_executor.invoke(user_query)
-                #             refined_answer = beautify_output(user_answer['output'])
-                #             st.write(refined_answer)
-                #     except Exception as e:
-                #         st.error(f"Error processing your query: {e}")
+                st.divider()
+                user_query = st.text_input("Ask your question related to Incurred to Earned Premium Ratio Triangle:")
+                if user_query:
+                    try:
+                        with st.spinner("Processing your query..."):
+                            agent_executor = create_pandas_dataframe_agent(
+                                                llm,
+                                                incurred_to_earned_triangle,
+                                                agent_type="zero-shot-react-description",
+                                                verbose=True,
+                                                allow_dangerous_code=True,
+                                                return_intermediate_steps=True)
+                            user_answer = agent_executor.invoke(user_query)
+                            refined_answer = beautify_output(user_answer['output'])
+                            st.write(refined_answer)
+                    except Exception as e:
+                        st.error(f"Error processing your query: {e}")
 
         elif option == 'Ultimate Claims & IBNR Reserves Summary Report':
             st.write("Let's analyze the comparisons between the outputs of each actuarial method! Please select an option from the dropdown below:")
