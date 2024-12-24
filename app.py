@@ -25,7 +25,7 @@ from langchain_experimental.agents import create_pandas_dataframe_agent
 from langchain_google_genai import GoogleGenerativeAI
 from langchain_google_genai.chat_models import ChatGoogleGenerativeAI
 
-gemini.api_key = st.secrets["API_KEY"]
+gemini.api_key = st.secrets["api"]
 llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=gemini.api_key, temperature=0.2)
 
 # Title of the app
