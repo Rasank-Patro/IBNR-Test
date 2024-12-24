@@ -11,6 +11,7 @@ statsmodels
 streamlit
 langchain
 langchain_experimental
+langchain_google_genai
 openai
 black
 tabulate
