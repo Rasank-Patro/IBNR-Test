@@ -1,0 +1,16 @@
+pandas
+numpy
+matplotlib
+seaborn
+scipy
+lightgbm
+scikit-learn
+plotly
+xlsxwriter
+statsmodels
+streamlit
+langchain
+openai
+black
+tabulate
+huggingface-hub
