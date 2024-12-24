@@ -10,6 +10,7 @@ xlsxwriter
 statsmodels
 streamlit
 langchain
+langchain_experimental
 openai
 black
 tabulate
