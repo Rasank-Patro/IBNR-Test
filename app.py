@@ -25,9 +25,9 @@ from langchain_experimental.agents import create_pandas_dataframe_agent
 from langchain_google_genai import GoogleGenerativeAI
 from langchain_google_genai.chat_models import ChatGoogleGenerativeAI
 
-os.environ['API_KEY'] = st.secrets['api']
-# gemini.api_key = st.secrets["api"]
-llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=API_KEY, temperature=0.2)
+# os.environ['API_KEY'] = st.secrets['api']
+api_key = 'AIzaSyBRU9KGJjN2Mh4NsJ4GeNhkyyi9B7yZOuw'
+llm = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=api_key, temperature=0.2)
 
 # Title of the app
 st.title('IBNR Loss Reserves Usecase')
